@@ -1,13 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Configuration;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace WinFormDemo
@@ -15,11 +8,11 @@ namespace WinFormDemo
     public partial class Form1 : Form
     {
 
-        private int ThreadCount;
+        private int thread1Counter;
+        private int thread2Counter;
         public Form1()
         {
             InitializeComponent();
-            ThreadCount = 0;
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -29,28 +22,63 @@ namespace WinFormDemo
 
         private void buttonStartThread_Click(object sender, EventArgs e)
         {
-            StartThreat();
+            Loop1();
+            Loop2();
         }
 
-        private void StartThreat()
+        private void Loop1()
         {
             new Thread(() =>
             {
-                int i = DemoThreadStart();
-                if (i < 10)
-                {
-                    Thread.Sleep(1000);
-                    StartThreat();
-                }
+                bool response = Threat1Proc();
+                if (response) Loop1();
             }).Start();
         }
 
-        private int DemoThreadStart()
+        private void Loop2()
         {
-            ThreadCount++;
-            label2.Invoke(new Action(() => label2.Text = "Demo thread started in count of " + ThreadCount));
-            Thread.Sleep(1000);
-            return ThreadCount;
+            new Thread(() =>
+            {
+                bool response = Threat2Proc();
+                if (response) Loop2();
+            }).Start();
+        }
+
+        private bool Threat1Proc()
+        {
+            try
+            {
+                thread1Counter = 0;
+                while (thread1Counter < 10)
+                {
+                    thread1Counter++;
+                    label2.Invoke(new Action(() => label2.Text = "Thread 1 is running in count of " + thread1Counter));
+                    Thread.Sleep(1000);
+                }
+                return true;
+            } catch
+            {
+                return false;
+            }
+        }
+
+        private bool Threat2Proc()
+        {
+            try
+            {
+                thread2Counter = 0;
+                while (thread1Counter < 10)
+                {
+                    thread2Counter++;
+                    label3.Invoke(new Action(() => label3.Text = "Thread 2 is running in count of " + thread2Counter));
+                    Thread.Sleep(2000);
+                }
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
     }
